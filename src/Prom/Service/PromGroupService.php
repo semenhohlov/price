@@ -2,6 +2,8 @@
 
 namespace App\Prom\Service;
 
+use App\Prom\DTO\PromGroupActivateDTO;
+use App\Prom\DTO\PromGroupDTO;
 use App\Prom\Entity\PromCategory;
 use App\Prom\Entity\PromGroup;
 use Doctrine\ORM\EntityManagerInterface;
@@ -37,79 +39,52 @@ class PromGroupService
         return $promGroup;
     }
 
-    public function create(
-        int $groupId,
-        string $name,
-        ?string $description = null,
-        ?string $image = null,
-        ?int $parentGroupId = null,
-        ?int $portalId = null,
-        ?string $portalUrl = null,
-        ?string $keywords = null,
-        ?string $keywordsUkr = null,
-    ): PromGroup
+    public function create(PromGroupDTO $model): PromGroup
     {
         $promGroup = new PromGroup();
 
-        $promGroup->setGroupId($groupId);
-        $promGroup->setName($name);
-        $promGroup->setDescription($description);
-        $promGroup->setImage($image);
-        $promGroup->setParentGroupId($parentGroupId);
-        $promGroup->setPortalId($portalId);
-        $promGroup->setPortalUrl($portalUrl);
-        $promGroup->setKeywords($keywords);
-        $promGroup->setKeywordsUkr($keywordsUkr);
+        $promGroup->setGroupId($model->getGroupId());
+        $promGroup->setName($model->getName());
+        $promGroup->setDescription($model->getDescription());
+        $promGroup->setImage($model->getImage());
+        $promGroup->setParentGroupId($model->getParentGroupId());
+        $promGroup->setPortalId($model->getPortalId());
+        $promGroup->setPortalUrl($model->getPortalUrl());
+        $promGroup->setKeywords($model->getKeywords());
+        $promGroup->setKeywordsUkr($model->getKeywordsUkr());
 
         $this->save($promGroup);
 
         return $promGroup;
     }
 
-    public function update(
-        int $id,
-        ?string $name,
-        ?string $description = null,
-        ?string $image = null,
-        ?int $parentGroupId = null,
-        ?int $portalId = null,
-        ?string $portalUrl = null,
-        ?string $keywords = null,
-        ?string $keywordsUkr = null,
-    ): PromGroup
+    public function update(PromGroupDTO $model, int $id): PromGroup
     {
         $promGroup = $this->item($id);
 
-        if ($name) {
-            $promGroup->setName($name);
+        if ($model->getName()) {
+            $promGroup->setName($model->getName());
         }
-
-        if ($description) {
-            $promGroup->setDescription($description);
+        if ($model->getDescription()) {
+            $promGroup->setDescription($model->getDescription());
         }
-
-        if ($image) {
-            $promGroup->setImage($image);
+        if ($model->getImage()) {
+            $promGroup->setImage($model->getImage());
         }
-
-        if ($parentGroupId) {
-            $promGroup->setParentGroupId($parentGroupId);
+        if ($model->getParentGroupId()) {
+            $promGroup->setParentGroupId($model->getParentGroupId());
         }
-
-        if ($portalId) {
-            $promGroup->setPortalId($portalId);
+        if ($model->getPortalId()) {
+            $promGroup->setPortalId($model->getPortalId());
         }
-
-        if ($portalUrl) {
-            $promGroup->setPortalUrl($portalUrl);
+        if ($model->getPortalUrl()) {
+            $promGroup->setPortalUrl($model->getPortalUrl());
         }
-
-        if ($keywords) {
-            $promGroup->setKeywords($keywords);
+        if ($model->getKeywords()) {
+            $promGroup->setKeywords($model->getKeywords());
         }
-
-        if ($keywordsUkr) {
-            $promGroup->setKeywordsUkr($keywordsUkr);
+        if ($model->getKeywordsUkr()) {
+            $promGroup->setKeywordsUkr($model->getKeywordsUkr());
         }
 
         $this->save($promGroup);
@@ -117,7 +92,7 @@ class PromGroupService
         return $promGroup;
     }
 
-    public function delete(int $id)
+    public function delete(int $id): bool
     {
         $promGroup = $this->item($id);
 
@@ -130,15 +105,19 @@ class PromGroupService
                 $e->getMessage()
             );
         }
+
+        return true;
     }
 
-    public function activate(int $id, bool $active = true)
+    public function activate(int $id, PromGroupActivateDTO $model): PromGroup
     {
         $promGroup = $this->item($id);
 
-        $promGroup->setIsActive($active);
+        $promGroup->setIsActive($model->getActivate());
 
         $this->save($promGroup);
+
+        return $promGroup;
     }
 
     private function save(PromGroup $promGroup)

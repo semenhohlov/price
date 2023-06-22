@@ -1,47 +1,19 @@
 <?php
 
-namespace App\Prom\Entity;
+namespace App\Prom\DTO;
 
-use Doctrine\ORM\Mapping as ORM;
-use Doctrine\ORM\Mapping\Table;
-
-#[ORM\Entity()]
-#[Table(name: 'prom_groups')]
-class PromGroup
+class PromGroupDTO
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
     private ?int $id = null;
-
-    #[ORM\Column(type: "integer", nullable: false)]
     private ?int $groupId = null;
-
-    #[ORM\Column(type: "string", length: 255, nullable: false)]
     private ?string $name = null;
-
-    #[ORM\Column(type: "string", length: 255, nullable: true)]
     private ?string $description = null;
-    
-    #[ORM\Column(type: "string", length: 255, nullable: true)]
     private ?string $image = null;
-
-    #[ORM\Column(type: "integer", nullable: true)]
     private ?int $parentGroupId = null;
-
-    #[ORM\Column(type: "boolean", nullable: true, options: ['default' => true])]
     private ?bool $isActive = true;
-
-    #[ORM\Column(type: "integer", nullable: true)]
     private ?int $portalId = null;
-
-    #[ORM\Column(type: "string", length: 255, nullable: true)]
     private ?string $portalUrl = null;
-
-    #[ORM\Column(type: "text", nullable: true)]
     private ?string $keywords = null;
-
-    #[ORM\Column(type: "text", nullable: true)]
     private ?string $keywordsUkr = null;
 
     public function getId()
