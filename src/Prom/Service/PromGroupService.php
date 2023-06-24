@@ -40,6 +40,17 @@ class PromGroupService
         return $promGroup;
     }
 
+    public function getByGroupId(int $groupId): PromGroup
+    {
+        $promGroup = $this->repository->findOneBy(['groupId' => $groupId]);
+        
+        if (!$promGroup) {
+            throw new NotFoundHttpException('Prom group with group id: ' . $groupId . ' not found.');
+        }
+
+        return $promGroup;
+    }
+
     public function create(PromGroupDTO $model): PromGroup
     {
         $promGroup = new PromGroup();
@@ -53,9 +64,6 @@ class PromGroupService
         $promGroup->setPortalUrl($model->getPortalUrl());
         $promGroup->setKeywords($model->getKeywords());
         $promGroup->setKeywordsUkr($model->getKeywordsUkr());
-
-        $promGroup->setCreatedAt(new DateTime('now'));
-        $promGroup->setUpdatedAt(new DateTime('now'));
 
         $this->save($promGroup);
 
@@ -90,8 +98,6 @@ class PromGroupService
         if ($model->getKeywordsUkr()) {
             $promGroup->setKeywordsUkr($model->getKeywordsUkr());
         }
-
-        $promGroup->setUpdatedAt(new DateTime('now'));
 
         $this->save($promGroup);
 
@@ -128,18 +134,8 @@ class PromGroupService
         return $promGroup;
     }
 
-    private function save(PromGroup $promGroup)
+    public function save(PromGroup $promGroup)
     {
-        $parentGroupId = $promGroup->getParentGroupId();
-
-        if ($parentGroupId) {
-            if (!$this->repository->findOneBy(['id' => $parentGroupId])) {
-                throw new NotFoundHttpException(
-                    'Parent group with id ' . $parentGroupId . ' not found.'
-                );
-            }
-        }
-
         $portalId = $promGroup->getPortalId();
 
         if ($portalId) {
@@ -153,6 +149,12 @@ class PromGroupService
             }
         }
 
+        if (!$promGroup->getId()) {
+            $promGroup->setCreatedAt(new DateTime('now'));
+        }
+
+        $promGroup->setUpdatedAt(new DateTime('now'));
+
         try {
             $this->em->persist($promGroup);
             $this->em->flush();
@@ -162,5 +164,11 @@ class PromGroupService
                 $e->getMessage()
             );
         }
+    }
+
+    public function markUnactive($date)
+    {
+        $query = $this->em->createQuery("UPDATE " . PromGroup::class . " g SET g.isActive = 0 WHERE g.updatedAt < '" . $date . "'");
+        $query->getResult();
     }
 }

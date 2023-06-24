@@ -4,10 +4,13 @@ namespace App\Controller\Api\Prom;
 
 use App\Prom\DTO\PromGroupActivateDTO;
 use App\Prom\DTO\PromGroupDTO;
+use App\Prom\DTO\PromGroupSyncDTO;
+use App\Prom\Message\SyncPromGroups;
 use App\Prom\Service\PromGroupService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -15,15 +18,18 @@ use Symfony\Component\Serializer\SerializerInterface;
 class PromGroupController extends AbstractController
 {
     private SerializerInterface $serializer;
+    private MessageBusInterface $mb;
     private PromGroupService $service;
 
     public function __construct(
         PromGroupService $service,
-        SerializerInterface $serializer
+        SerializerInterface $serializer,
+        MessageBusInterface $mb
     )
     {
         $this->service = $service;
         $this->serializer = $serializer;
+        $this->mb = $mb;
     }
     
     #[Route('', methods: 'get')]
@@ -39,6 +45,14 @@ class PromGroupController extends AbstractController
     {
         return $this->json([
             'prom_group' => $this->service->item($id)
+        ]);
+    }
+
+    #[Route('/{groupId}/group-id', methods: 'get')]
+    public function getByGroupId(int $groupId): Response
+    {
+        return $this->json([
+            'prom_group' => $this->service->getByGroupId($groupId)
         ]);
     }
 
@@ -81,6 +95,22 @@ class PromGroupController extends AbstractController
 
         return $this->json([
             'prom_group' => $this->service->activate($id, $model)
+        ]);
+    }
+
+    #[Route('/sync', methods: 'post')]
+    public function sync(Request $request): Response
+    {
+        $model = $this->requestToDTO(
+            $request->getContent(), PromGroupSyncDTO::class
+        );
+
+        $m = $this->mb->dispatch(
+            new SyncPromGroups($model->getToken())
+        );
+
+        return $this->json([
+            'message' => 'watch var/log/log.txt'
         ]);
     }
 
