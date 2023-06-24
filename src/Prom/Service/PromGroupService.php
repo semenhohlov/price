@@ -6,6 +6,7 @@ use App\Prom\DTO\PromGroupActivateDTO;
 use App\Prom\DTO\PromGroupDTO;
 use App\Prom\Entity\PromCategory;
 use App\Prom\Entity\PromGroup;
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Component\HttpFoundation\Response;
@@ -53,6 +54,9 @@ class PromGroupService
         $promGroup->setKeywords($model->getKeywords());
         $promGroup->setKeywordsUkr($model->getKeywordsUkr());
 
+        $promGroup->setCreatedAt(new DateTime('now'));
+        $promGroup->setUpdatedAt(new DateTime('now'));
+
         $this->save($promGroup);
 
         return $promGroup;
@@ -87,6 +91,8 @@ class PromGroupService
             $promGroup->setKeywordsUkr($model->getKeywordsUkr());
         }
 
+        $promGroup->setUpdatedAt(new DateTime('now'));
+
         $this->save($promGroup);
 
         return $promGroup;
@@ -114,6 +120,8 @@ class PromGroupService
         $promGroup = $this->item($id);
 
         $promGroup->setIsActive($model->getActivate());
+
+        $promGroup->setUpdatedAt(new DateTime('now'));
 
         $this->save($promGroup);
 
