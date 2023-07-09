@@ -21,6 +21,11 @@ doctrine:
                 dir: '%kernel.project_dir%/src/Prom/Entity'
                 prefix: 'App\Prom\Entity'
                 alias: Prom
+            Price:
+                is_bundle: false
+                dir: '%kernel.project_dir%/src/Price/Entity'
+                prefix: 'App\Price\Entity'
+                alias: Price
 
 when@test:
     doctrine:
